@@ -132,6 +132,14 @@ const evaluateLine2 = (line) => {
   return valid && (!clippedCandidate || evaluateLine(clippedCandidate))
 }
 
+const evaluateLineBrute = (line) => {
+  if (evaluateLine(line)) return true
+
+  const candidates = line.map(() => [...line]).map((copy, cIndex) => copy.map((value, vIndex) => cIndex === vIndex ? null : value).filter((value) => value != null))
+
+  return candidates.some((testLine) => evaluateLine(testLine))
+}
+
 const partTwo = lines.reduce((total, line) => {
   return total + (evaluateLine2(line) ? 1 : 0)
 }, 0)
