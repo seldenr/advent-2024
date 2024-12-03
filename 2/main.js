@@ -132,16 +132,24 @@ const evaluateLine2 = (line) => {
   return valid && (!clippedCandidate || evaluateLine(clippedCandidate))
 }
 
-const evaluateLineBrute = (line) => {
-  if (evaluateLine(line)) return true
+const evaluateLineBrute = (line) => evaluateLine(line) || line.map(() => [...line]).map((copy, cIndex) => copy.map((value, vIndex) => cIndex === vIndex ? null : value).filter((value) => value != null)).some((testLine) => evaluateLine(testLine))
 
-  const candidates = line.map(() => [...line]).map((copy, cIndex) => copy.map((value, vIndex) => cIndex === vIndex ? null : value).filter((value) => value != null))
+const partTwo = lines.reduce(({ result, brute, smart }, line) => {
+  const newResult = result + (evaluateLine2(line) ? 1 : 0)
 
-  return candidates.some((testLine) => evaluateLine(testLine))
-}
+  const bruteStart = performance.now()
+  evaluateLineBrute(line)
+  const newBrute = (performance.now() - bruteStart) + brute
 
-const partTwo = lines.reduce((total, line) => {
-  return total + (evaluateLine2(line) ? 1 : 0)
-}, 0)
+  const smartStart = performance.now()
+  evaluateLine2(line)
+  const newSmart = (performance.now() - smartStart) + smart
+
+  return {
+    result: newResult,
+    brute: newBrute,
+    smart: newSmart,
+  }
+}, { result: 0, brute: 0, smart: 0 })
 
 console.log('partTwo', partTwo)
